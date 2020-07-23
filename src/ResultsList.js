@@ -4,17 +4,11 @@ import { Table } from 'semantic-ui-react'
 class ResultsList extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: [] };
-    }
-
-    componentDidMount() {
-        fetch(`http://localhost:8000/api/${this.props.type}`)
-          .then(response => response.json())
-          .then(data => this.setState({ data: data.data }));
+        this.state = {};
     }
 
     render() {
-        var data = this.state.data || [];
+        var data = this.props.data || [];
         const cols = this.getCols();
 
         return (
@@ -63,7 +57,7 @@ class ResultsList extends Component {
                         label: 'Last Name'
                     },
                     {
-                        id: 'email',
+                        id: 'email_address',
                         label: 'Email'
                     },
                     {

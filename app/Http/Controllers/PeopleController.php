@@ -7,8 +7,10 @@ use Illuminate\Validation\Rule;
 
 use App\Http\Resources\PeopleCollection;
 use App\Http\Resources\PersonResource;
+use App\Models\Group;
 use App\Models\Person;
 use App\Utils\CsvUtils;
+use Validator;
 
 class PeopleController extends Controller
 {
@@ -40,26 +42,74 @@ class PeopleController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->hasFile('file')) {
-            $file = request()->file('file');
+        if ($request->hasFile('importFile')) {
+            $importFile = request()->file('importFile');
 
-            if (isset($file)) {
-                $fileData = CsvUtils::getDataFromFilePath($file->getRealPath());
+            if (isset($importFile)) {
+                $fileData = CsvUtils::getDataFromFilePath($importFile->getRealPath());
 
-                return [
-                    'fileData' => $fileData
-                ];
+                if (!empty($fileData)) {
+                    $headers = array_shift($fileData);
+
+                    if ($headers === ['id', 'first_name', 'last_name', 'email_address', 'status'] ||
+                        $headers === ['id', 'first_name', 'last_name', 'email_address', 'status', 'group_name']) {
+                        if (CsvUtils::isValidCsvData($headers, $fileData)) {
+                            $mappedFileData = CsvUtils::mapDataToHeaders($headers, $fileData);
+
+                            $existingPeopleIds = Person::all()->
+                                map(function ($person) {
+                                    return (string) $person->id;
+                                })->
+                                toArray();
+
+                            $groupsMap = Group::all()->
+                                mapWithKeys(function ($group) {
+                                    return [$group->group_name => $group->id];
+                                });
+
+                            foreach ($mappedFileData as $row) {
+                                // https://laravel.com/docs/7.x/validation
+                                $validator = Validator::make($row, [
+                                    'first_name'    => 'required|max:255',
+                                    'last_name'     => 'required|max:255',
+                                    'email_address' => 'required|email',
+                                    'status'        => Rule::in(['active', 'archived']),
+                                    'group_name'    => 'nullable'
+                                ]);
+
+                                if ($validator->fails()) {
+                                    return [
+                                        'validationFailure' => true
+                                    ];
+                                }
+
+                                // Check for a valid group name and map to a group ID.
+                                if (isset($row['group_name'])) {
+                                    $row['group_id'] = $groupsMap[$row['group_name']] ?? null;
+                                }
+
+                                // Update or insert.
+                                if (in_array($row['id'], $existingPeopleIds)) {
+                                    $person = Person::find($row['id'])->update($row);
+                                } else {
+                                    $person = Person::create($row);
+                                }
+                            }
+
+                            return new PeopleCollection(Person::all());
+                        }
+
+                        // To-do: Report out invalid-CSV-file error.
+                    }
+
+                    // To-do: Report out bad-headers error.
+                }
+
+                // To-do: Report out file-empty error.
             }
         }
 
-        // $request->validate([
-        //     'first_name'    => 'required|max:255',
-        //     'last_name'     => 'required|max:255',
-        //     'email_address' => 'required|email',
-        //     'status'        => Rule::in(['active', 'archived'])
-        // ]);
-
-        // $person = Person::create($request->all());
+        // To-do: Report out weird-file error.
 
         // return (new PersonResource($person))
         //     ->response()

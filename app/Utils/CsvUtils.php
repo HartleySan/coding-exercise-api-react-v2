@@ -25,4 +25,35 @@
 
             return $data;
         }
+
+        public static function isValidCsvData($headers, $fileData) {
+            // Make sure each row has the same number of values as there are headers.
+            $numHeaders = count($headers);
+
+            foreach ($fileData as $row) {
+                if (count($row) !== $numHeaders) {
+                    return false;
+                }
+            }
+
+            // Any other CSV validation goes here.
+
+            return true;
+        }
+
+        public static function mapDataToHeaders($headers, $fileData) {
+            $mappedData = [];
+
+            foreach ($fileData as $row) {
+                $mappedRow = [];
+
+                foreach ($row as $i => $val) {
+                    $mappedRow[$headers[$i]] = $val;
+                }
+
+                $mappedData[] = $mappedRow;
+            }
+
+            return $mappedData;
+        }
     }

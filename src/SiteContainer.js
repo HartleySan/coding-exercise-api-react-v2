@@ -12,6 +12,7 @@ class SiteContainer extends Component {
     }
 
     render() {
+        // https://semantic-ui.com/elements/button.html
         return (
             <Container style={{ margin: 20 }}>
                 <Header as="h3"><span role="img" aria-label="logo">⛵️</span> Breeze Church Management </Header>
