@@ -8,35 +8,38 @@ class ResultsList extends Component {
     }
 
     componentDidMount() {
-        fetch("http://localhost:8000/api/people")
+        fetch(`http://localhost:8000/api/${this.props.type}`)
           .then(response => response.json())
           .then(data => this.setState({ data: data.data }));
     }
 
     render() {
         var data = this.state.data || [];
+        const cols = this.getCols();
 
         return (
             <Table celled padded>
               <Table.Header>
                 <Table.Row>
-                  <Table.HeaderCell singleLine>First Name</Table.HeaderCell>
-                  <Table.HeaderCell>Last Name</Table.HeaderCell>
-                  <Table.HeaderCell>Email</Table.HeaderCell>
-                  <Table.HeaderCell>Status</Table.HeaderCell>
+                    {cols.map((col, index) => {
+                        return (
+                            <Table.HeaderCell singleLine key={index}>{col.label}</Table.HeaderCell>
+                        );
+                    })}
                 </Table.Row>
               </Table.Header>
 
               <Table.Body>
 
               {
-                  data.map((person, index) => {
+                  data.map((item, index) => {
                       return (
                           <Table.Row key={index}>
-                              <Table.Cell singleLine>{ person.first_name }</Table.Cell>
-                              <Table.Cell singleLine>{ person.last_name }</Table.Cell>
-                              <Table.Cell singleLine>{ person.email_address }</Table.Cell>
-                              <Table.Cell singleLine>{ person.status }</Table.Cell>
+                            {cols.map((col, colIndex) => {
+                                return (
+                                    <Table.Cell singleLine key={colIndex}>{ item[col.id] }</Table.Cell>
+                                );
+                            })}
                           </Table.Row>
                       );
                     })
@@ -44,8 +47,49 @@ class ResultsList extends Component {
 
               </Table.Body>
             </Table>
-    );
-}
+        );
+    }
+
+    getCols() {
+        switch (this.props.type) {
+            case 'people':
+                return [
+                    {
+                        id: 'first_name',
+                        label: 'First Name'
+                    },
+                    {
+                        id: 'last_name',
+                        label: 'Last Name'
+                    },
+                    {
+                        id: 'email',
+                        label: 'Email'
+                    },
+                    {
+                        id: 'status',
+                        label: 'Status'
+                    },
+                    {
+                        id: 'group_name',
+                        label: 'Group Name'
+                    }
+                ];
+            case 'groups':
+                return [
+                    {
+                        id: 'group_name',
+                        label: 'Group Name'
+                    },
+                    {
+                        id: 'active_people',
+                        label: 'Active People'
+                    }
+                ];
+            default:
+                return [];
+        }
+    }
 
 }
 
