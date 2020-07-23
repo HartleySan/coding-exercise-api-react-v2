@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use App\Http\Resources\PeopleCollection;
 use App\Http\Resources\PersonResource;
 use App\Models\Person;
+use App\Utils\CsvUtils;
 
 class PeopleController extends Controller
 {
@@ -39,18 +40,32 @@ class PeopleController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'first_name'    => 'required|max:255',
-            'last_name'     => 'required|max:255',
-            'email_address' => 'required|email',
-            'status'        => Rule::in(['active', 'archived'])
-        ]);
+        if ($request->hasFile('file')) {
+            $file = request()->file('file');
 
-        $person = Person::create($request->all());
+            if (isset($file)) {
+                $fileData = CsvUtils::getDataFromFilePath($file->getRealPath());
 
-        return (new PersonResource($person))
-            ->response()
-            ->setStatusCode(201);
+                return [
+                    'fileData' => $fileData
+                ];
+            }
+        }
+
+        // $request->validate([
+        //     'first_name'    => 'required|max:255',
+        //     'last_name'     => 'required|max:255',
+        //     'email_address' => 'required|email',
+        //     'status'        => Rule::in(['active', 'archived'])
+        // ]);
+
+        // $person = Person::create($request->all());
+
+        // return (new PersonResource($person))
+        //     ->response()
+        //     ->setStatusCode(201);
+
+        return ['123' => 456];
     }
 
     /**

@@ -39,18 +39,20 @@ class GroupsController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'first_name'    => 'required|max:255',
-            'last_name'     => 'required|max:255',
-            'email_address' => 'required|email',
-            'status'        => Rule::in(['active', 'archived'])
-        ]);
+        // $request->validate([
+        //     'first_name'    => 'required|max:255',
+        //     'last_name'     => 'required|max:255',
+        //     'email_address' => 'required|email',
+        //     'status'        => Rule::in(['active', 'archived'])
+        // ]);
 
-        $group = Group::create($request->all());
+        // $group = Group::create($request->all());
 
-        return (new GroupResource($group))
-            ->response()
-            ->setStatusCode(201);
+        // return (new GroupResource($group))
+        //     ->response()
+        //     ->setStatusCode(201);
+
+        return ['123' => 456];
     }
 
     /**
