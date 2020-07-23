@@ -30,8 +30,18 @@ class ResultsList extends Component {
                       return (
                           <Table.Row key={index}>
                             {cols.map((col, colIndex) => {
+                                if (col.nl2br) {
+                                    return (
+                                        <Table.Cell singleLine key={colIndex}>{item[col.id].split('\n').map((oneVal, nl2brIndex) => {
+                                            return (
+                                                <span key={nl2brIndex}>{oneVal}<br /></span>
+                                            );
+                                        })}</Table.Cell>
+                                    );
+                                }
+
                                 return (
-                                    <Table.Cell singleLine key={colIndex}>{ item[col.id] }</Table.Cell>
+                                    <Table.Cell singleLine key={colIndex}>{item[col.id]}</Table.Cell>
                                 );
                             })}
                           </Table.Row>
@@ -61,7 +71,7 @@ class ResultsList extends Component {
                         label: 'Email'
                     },
                     {
-                        id: 'status',
+                        id: 'status_name',
                         label: 'Status'
                     },
                     {
@@ -76,8 +86,9 @@ class ResultsList extends Component {
                         label: 'Group Name'
                     },
                     {
-                        id: 'active_people',
-                        label: 'Active People'
+                        id: 'active_people_string',
+                        label: 'Active People',
+                        nl2br: true
                     }
                 ];
             default:

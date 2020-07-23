@@ -90,9 +90,9 @@ class PeopleController extends Controller
 
                                 // Update or insert.
                                 if (in_array($row['id'], $existingPeopleIds)) {
-                                    $person = Person::find($row['id'])->update($row);
+                                    Person::find($row['id'])->update($row);
                                 } else {
-                                    $person = Person::create($row);
+                                    Person::create($row);
                                 }
                             }
 

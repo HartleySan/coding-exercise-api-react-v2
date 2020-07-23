@@ -8,6 +8,8 @@ use Illuminate\Validation\Rule;
 use App\Http\Resources\GroupsCollection;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
+use App\Utils\CsvUtils;
+use Validator;
 
 class GroupsController extends Controller
 {
@@ -39,16 +41,60 @@ class GroupsController extends Controller
      */
     public function store(Request $request)
     {
-        // $request->validate([
-        //     'first_name'    => 'required|max:255',
-        //     'last_name'     => 'required|max:255',
-        //     'email_address' => 'required|email',
-        //     'status'        => Rule::in(['active', 'archived'])
-        // ]);
+        if ($request->hasFile('importFile')) {
+            $importFile = request()->file('importFile');
 
-        // $group = Group::create($request->all());
+            if (isset($importFile)) {
+                $fileData = CsvUtils::getDataFromFilePath($importFile->getRealPath());
 
-        // return (new GroupResource($group))
+                if (!empty($fileData)) {
+                    $headers = array_shift($fileData);
+
+                    if ($headers === ['id', 'group_name']) {
+                        if (CsvUtils::isValidCsvData($headers, $fileData)) {
+                            $mappedFileData = CsvUtils::mapDataToHeaders($headers, $fileData);
+
+                            $existingGroupIds = Group::all()->
+                                map(function ($group) {
+                                    return (string) $group->id;
+                                })->
+                                toArray();
+
+                            foreach ($mappedFileData as $row) {
+                                $validator = Validator::make($row, [
+                                    'group_name'    => 'required|max:255'
+                                ]);
+
+                                if ($validator->fails()) {
+                                    return [
+                                        'validationFailure' => true
+                                    ];
+                                }
+
+                                // Update or insert.
+                                if (in_array($row['id'], $existingGroupIds)) {
+                                    Group::find($row['id'])->update($row);
+                                } else {
+                                    Group::create($row);
+                                }
+                            }
+
+                            return new GroupsCollection(Group::all());
+                        }
+
+                        // To-do: Report out invalid-CSV-file error.
+                    }
+
+                    // To-do: Report out bad-headers error.
+                }
+
+                // To-do: Report out file-empty error.
+            }
+        }
+
+        // To-do: Report out weird-file error.
+
+        // return (new PersonResource($person))
         //     ->response()
         //     ->setStatusCode(201);
 

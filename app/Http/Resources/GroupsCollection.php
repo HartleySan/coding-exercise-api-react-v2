@@ -14,6 +14,12 @@ class GroupsCollection extends ResourceCollection
      */
      public function toArray($request)
      {
+        $this->collection = $this->collection->map(function ($group) {
+            $group->active_people_string = $group->active_people_string;
+
+            return $group;
+        });
+
          return [
              'success' => true,
              'data' => $this->collection

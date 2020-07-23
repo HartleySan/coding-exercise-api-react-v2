@@ -19,8 +19,9 @@ class PersonResource extends JsonResource
          'first_name'    => $this->first_name,
          'last_name'     => $this->last_name,
          'email_address' => $this->email_address,
-         'status'        => $this->status,
+         'status'        => $this->status_name,
          'group_id'      => $this->group_id,
+         'group_name'    => $this->group->group_name,
          'created_at'    => $this->created_at,
          'updated_at'    => $this->updated_at,
      ];

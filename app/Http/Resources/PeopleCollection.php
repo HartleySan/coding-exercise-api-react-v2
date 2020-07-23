@@ -14,6 +14,13 @@ class PeopleCollection extends ResourceCollection
      */
      public function toArray($request)
      {
+        $this->collection = $this->collection->map(function ($person) {
+            $person->status_name = $person->status_name;
+            $person->group_name = $person->group_name;
+
+            return $person;
+        });
+
          return [
              'success' => true,
              'data' => $this->collection
