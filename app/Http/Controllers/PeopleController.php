@@ -49,7 +49,7 @@ class PeopleController extends Controller
             if (isset($importFile)) {
                 $fileData = CsvUtils::getDataFromFilePath($importFile->getRealPath());
 
-                if (!empty($fileData)) {
+                if (count($fileData) > 1) {
                     $headers = array_shift($fileData);
 
                     if ($headers === ['id', 'first_name', 'last_name', 'email_address', 'status'] ||
@@ -100,24 +100,17 @@ class PeopleController extends Controller
                             return new PeopleCollection(Person::all());
                         }
 
-                        // To-do: Report out invalid-CSV-file error.
-                        return ResponseUtils::error('Testing');
+                        return ResponseUtils::error('The CSV file is not properly formatted. Please try again.');
                     }
 
-                    // To-do: Report out bad-headers error.
+                    return ResponseUtils::error('The CSV file headers are not valid. The header row must be one of the following: id, first_name, last_name, email_address, status OR id, first_name, last_name, email_address, status, group_name');
                 }
 
-                // To-do: Report out file-empty error.
+                return ResponseUtils::error('The CSV file does not contain any data.');
             }
         }
 
-        // To-do: Report out weird-file error.
-
-        // return (new PersonResource($person))
-        //     ->response()
-        //     ->setStatusCode(201);
-
-        return ['123' => 456];
+        return ResponseUtils::error('The selected file is not a valid CSV file. Please try again.');
     }
 
     /**

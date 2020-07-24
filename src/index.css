@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.flashMsg {
+    background: #F2DEDE;
+    border: #EED3D6 solid 1px;
+    border-radius: 2px;
+    color: #A94442;
+    cursor: pointer;
+    padding: 20px;
+    position: fixed;
+    margin: 20px;
+    top: 0;
+    width: calc(100% - 40px);
+}

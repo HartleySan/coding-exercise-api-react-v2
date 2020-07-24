@@ -3,6 +3,8 @@ import { Header } from 'semantic-ui-react'
 
 import ResultsList from "./ResultsList";
 
+import eventBus from "./lib/eventBus";
+
 class Tab extends Component {
     constructor(props) {
         super(props);
@@ -45,10 +47,10 @@ class Tab extends Component {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('data', data);
-
                     if (data.success) {
                         this.setState({ data: data.data });
+                    } else if (data.error) {
+                        eventBus.emit('errorFlashMsg', data.msg);
                     }
                 });
 

@@ -2,9 +2,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import SiteContainer from "./SiteContainer";
+import FlashMsg from "./FlashMsg";
+
+import './index.css';
 
 const App = () => (
-    <SiteContainer />
+    <div>
+        <SiteContainer />
+        <FlashMsg />
+    </div>
 );
 
 const styleLink = document.createElement("link");
