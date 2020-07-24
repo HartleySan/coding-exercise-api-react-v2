@@ -12,6 +12,11 @@ code {
     monospace;
 }
 
+.crudActions {
+    display: flex;
+    justify-content: space-between;
+}
+
 .flashMsg {
     background: #F2DEDE;
     border: #EED3D6 solid 1px;
