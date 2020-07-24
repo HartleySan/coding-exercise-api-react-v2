@@ -9,6 +9,7 @@ use App\Http\Resources\PeopleCollection;
 use App\Http\Resources\PersonResource;
 use App\Models\Group;
 use App\Models\Person;
+use App\Models\SystemList;
 use App\Utils\CsvUtils;
 use App\Utils\ResponseUtils;
 use Validator;
@@ -132,7 +133,26 @@ class PeopleController extends Controller
      */
     public function edit($id)
     {
-        //
+        $statuses = SystemList::where('list_name', 'person_status')->
+            get()->
+            map(function ($listItem) {
+                return [
+                    'id' => $listItem->list_item_namespace,
+                    'name' => $listItem->list_item_label
+                ];
+            });
+
+        $groups = Group::select('id', 'group_name AS name')->
+            orderBy('name', 'asc')->
+            get();
+
+        return [
+            'editItem' => new PersonResource(Person::findOrFail($id)),
+            'options' => [
+                'statuses' => $statuses,
+                'groups' => $groups
+            ]
+        ];
     }
 
     /**

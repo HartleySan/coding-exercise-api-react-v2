@@ -19,6 +19,8 @@ class CreateSystemListsTable extends Migration
             $table->string('list_item_namespace');
             $table->string('list_item_label');
             $table->timestamps();
+
+            $table->index(['list_name', 'list_item_namespace']);
         });
     }
 

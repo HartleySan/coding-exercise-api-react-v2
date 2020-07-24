@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Header, List } from 'semantic-ui-react'
+import { Button, Container, Header, List } from 'semantic-ui-react'
 
 class ViewItem extends Component {
     constructor(props) {
@@ -16,10 +16,10 @@ class ViewItem extends Component {
                     <Header as="h5">{`${viewItem.first_name} ${viewItem.last_name}`}</Header>
                     <List bulleted>
                         <List.Item>Email: {viewItem.email_address}</List.Item>
-                        <List.Item>Status: {viewItem.status}</List.Item>
+                        <List.Item>Status: {viewItem.status_name}</List.Item>
                         <List.Item>Group: {viewItem.group_name || '(None)'}</List.Item>
                     </List>
-                    <button className="ui button" onClick={this.props.goBack}>Go Back</button>
+                    <Button onClick={this.props.goBack}>Go Back</Button>
                 </Container>
             );
         } else if (this.props.type === 'groups') {
@@ -29,7 +29,7 @@ class ViewItem extends Component {
                     <List bulleted>
                         <List.Item>Active People: {viewItem.active_people_string.replace(/\n/g, ' | ')}</List.Item>
                     </List>
-                    <button className="ui button" onClick={this.props.goBack}>Go Back</button>
+                    <Button onClick={this.props.goBack}>Go Back</Button>
                 </Container>
             );
         }

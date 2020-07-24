@@ -115,7 +115,9 @@ class GroupsController extends Controller
      */
     public function edit($id)
     {
-        //
+        return [
+            'editItem' => new GroupResource(Group::findOrFail($id))
+        ];
     }
 
     /**

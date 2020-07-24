@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { Header } from 'semantic-ui-react'
+import { Button, Header } from 'semantic-ui-react'
 
+import EditItem from "./EditItem";
 import ResultsList from "./ResultsList";
 import ViewItem from "./ViewItem";
 
@@ -11,7 +12,7 @@ class Tab extends Component {
         super(props);
         this.state = {
             viewItem: null,
-            editItem: null,
+            editData: null,
             deleteItem: null,
             data: []
         };
@@ -36,7 +37,10 @@ class Tab extends Component {
 
     editRow(evt, id) {
         return (evt, id) => {
-            console.log('editRow', this.props.type, id);
+            fetch(`http://localhost:8000/api/${this.props.type}/${id}/edit`)
+                .then(response => response.json())
+                .then(data => this.setState({ editData: data }))
+                .catch(() => eventBus.emit('errorFlashMsg', 'A system error occurred. Please try again.'));
 
             evt.preventDefault();
         }
@@ -59,6 +63,15 @@ class Tab extends Component {
                     goBack={() => this.setState({ viewItem: null })}
                 />
             );
+        } else 
+        if (this.state.editData) {
+            return (
+                <EditItem
+                    type={this.props.type}
+                    editData={this.state.editData}
+                    goBack={() => this.setState({ editData: null })}
+                />
+            );
         }
 
         // To-do: Only show table when there is at least one row of data? Otherwise, show some message.
@@ -78,8 +91,8 @@ class Tab extends Component {
             <div>
                 <Header as="h4">{this.props.label}</Header>
                 <input type="file" style={{ display: 'none' }} className="importFile" onChange={(evt) => this.uploadFile(evt, this.props.type)} />
-                <button className="ui button" onClick={() => document.querySelector('.importFile').click()}>Import File</button>
-                <button className="ui button" onClick={this.props.viewBtn.action}>View {this.props.viewBtn.label}</button>
+                <Button onClick={() => document.querySelector('.importFile').click()}>Import File</Button>
+                <Button onClick={this.props.viewBtn.action}>View {this.props.viewBtn.label}</Button>
                 {this.renderContent()}
             </div>
         );
