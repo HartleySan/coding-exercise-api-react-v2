@@ -19,6 +19,10 @@ class Tab extends Component {
     }
 
     componentDidMount() {
+        this.getData();
+    }
+
+    getData() {
         fetch(`http://localhost:8000/api/${this.props.type}`)
           .then(response => response.json())
           .then(data => this.setState({ data: data.data }));
@@ -69,7 +73,10 @@ class Tab extends Component {
                 <EditItem
                     type={this.props.type}
                     editData={this.state.editData}
-                    goBack={() => this.setState({ editData: null })}
+                    goBack={() => {
+                        this.setState({ editData: null });
+                        this.getData();
+                    }}
                 />
             );
         }

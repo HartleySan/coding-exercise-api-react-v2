@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Container, Form, Header } from 'semantic-ui-react'
 
+import eventBus from "./lib/eventBus";
+
 class EditItem extends Component {
     constructor(props) {
         super(props);
@@ -9,6 +11,7 @@ class EditItem extends Component {
 
         if (props.type === 'people') {
             this.state = {
+                id: editItem.id,
                 first_name: editItem.first_name,
                 last_name: editItem.last_name,
                 email_address: editItem.email_address,
@@ -17,6 +20,7 @@ class EditItem extends Component {
             };
         } else if (props.type === 'groups') {
             this.state = {
+                id: editItem.id,
                 group_name: editItem.group_name
             };
         } else {
@@ -24,8 +28,25 @@ class EditItem extends Component {
         }
     }
 
-    save() {
-        console.log('save');
+    save(type, goBack) {
+        fetch(`http://localhost:8000/api/${type}/${this.state.id}`, {
+                method: 'put',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.state)
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if (data.success) {
+                    eventBus.emit('successFlashMsg', 'Successfully edited.');
+                    goBack();
+                } else if (data.error) {
+                    eventBus.emit('errorFlashMsg', data.msg);
+                }
+            })
+            .catch(() => eventBus.emit('errorFlashMsg', 'A system error occurred. Please try again.'));
     }
 
     render() {
@@ -73,7 +94,7 @@ class EditItem extends Component {
                         </Form.Field>
                     </Form>
                     <div>
-                        <Button primary onClick={this.save}>Save</Button>
+                        <Button primary onClick={() => this.save(this.props.type, this.props.goBack)}>Save</Button>
                         <Button onClick={this.props.goBack}>Go Back</Button>
                     </div>
                 </Container>
@@ -89,7 +110,7 @@ class EditItem extends Component {
                         </Form.Field>
                     </Form>
                     <div>
-                        <Button primary onClick={this.save}>Save</Button>
+                        <Button primary onClick={() => this.save(this.props.type, this.props.goBack)}>Save</Button>
                         <Button onClick={this.props.goBack}>Go Back</Button>
                     </div>
                 </Container>

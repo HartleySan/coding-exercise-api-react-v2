@@ -130,9 +130,16 @@ class GroupsController extends Controller
     public function update(Request $request, $id)
     {
         $group = Group::findOrFail($id);
-        $group->update($request->all());
+        $requestData = $request->all();
 
-        return response()->json(null, 204);
+        if (isset($requestData['group_name']) &&
+            !empty($requestData['group_name'])) {
+            $group->update($requestData);
+
+            return ResponseUtils::success();
+        }
+
+        return ResponseUtils::error('Please provide a valid value for all fields.');
     }
 
     /**

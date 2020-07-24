@@ -10,4 +10,11 @@
                 'msg' => $msg
             ], $code);
         }
+
+        public static function success($msg = null, $code = 200) {
+            return response()->json([
+                'success' => true,
+                'msg' => $msg
+            ], $code);
+        }
     }

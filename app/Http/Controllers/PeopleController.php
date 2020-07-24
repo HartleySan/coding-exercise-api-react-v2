@@ -165,9 +165,23 @@ class PeopleController extends Controller
     public function update(Request $request, $id)
     {
         $person = Person::findOrFail($id);
-        $person->update($request->all());
+        $requestData = $request->all();
 
-        return response()->json(null, 204);
+        if (isset($requestData['first_name'], $requestData['last_name'], $requestData['email_address'], $requestData['status'], $requestData['group_id']) &&
+            !empty($requestData['first_name']) &&
+            !empty($requestData['last_name']) &&
+            !empty($requestData['email_address']) &&
+            !empty($requestData['status'])) {
+            if ($requestData['group_id'] === 0) {
+                $requestData['group_id'] = null;
+            }
+
+            $person->update($requestData);
+
+            return ResponseUtils::success();
+        }
+
+        return ResponseUtils::error('Please provide a valid value for all fields.');
     }
 
     /**
