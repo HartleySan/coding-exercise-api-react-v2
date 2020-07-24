@@ -13,7 +13,7 @@
             if ($fp !== false) {
                 while (($row = fgetcsv($fp)) !== false) {
                     $row = array_map(function ($val) {
-                        return trim($val);
+                        return trim(strip_tags($val));
                     }, $row);
 
                     $data[] = $row;
