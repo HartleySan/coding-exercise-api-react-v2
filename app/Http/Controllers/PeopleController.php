@@ -10,6 +10,7 @@ use App\Http\Resources\PersonResource;
 use App\Models\Group;
 use App\Models\Person;
 use App\Utils\CsvUtils;
+use App\Utils\ResponseUtils;
 use Validator;
 
 class PeopleController extends Controller
@@ -100,6 +101,7 @@ class PeopleController extends Controller
                         }
 
                         // To-do: Report out invalid-CSV-file error.
+                        return ResponseUtils::error('Testing');
                     }
 
                     // To-do: Report out bad-headers error.

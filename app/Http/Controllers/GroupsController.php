@@ -9,6 +9,7 @@ use App\Http\Resources\GroupsCollection;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
 use App\Utils\CsvUtils;
+use App\Utils\ResponseUtils;
 use Validator;
 
 class GroupsController extends Controller
@@ -83,6 +84,7 @@ class GroupsController extends Controller
                         }
 
                         // To-do: Report out invalid-CSV-file error.
+                        return ResponseUtils::error('Testing');
                     }
 
                     // To-do: Report out bad-headers error.

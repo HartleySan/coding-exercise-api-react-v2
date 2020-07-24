@@ -45,6 +45,8 @@ class Tab extends Component {
                 })
                 .then(response => response.json())
                 .then(data => {
+                    console.log('data', data);
+
                     if (data.success) {
                         this.setState({ data: data.data });
                     }
