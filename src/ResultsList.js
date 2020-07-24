@@ -7,24 +7,6 @@ class ResultsList extends Component {
         this.state = {};
     }
 
-    viewRow(evt, id) {
-        console.log('viewRow', this.props.type, id);
-
-        evt.preventDefault();
-    }
-
-    editRow(evt, id) {
-        console.log('editRow', this.props.type, id);
-
-        evt.preventDefault();
-    }
-
-    deleteRow(evt, id) {
-        console.log('deleteRow', this.props.type, id);
-
-        evt.preventDefault();
-    }
-
     render() {
         // To-do: Pagination?
         var data = this.props.data || [];
@@ -66,9 +48,9 @@ class ResultsList extends Component {
                             })}
                             <Table.Cell singleLine>
                                 <div className="crudActions">
-                                    <a href={`/${this.props.type}/${item.id}`} onClick={(evt) => this.viewRow(evt, item.id)}>View</a>
-                                    <a href={`/${this.props.type}/${item.id}/edit`} onClick={(evt) => this.editRow(evt, item.id)}>Edit</a>
-                                    <a href={`/${this.props.type}/${item.id}`} onClick={(evt) => this.deleteRow(evt, item.id)}>Delete</a>
+                                    <a href={`/${this.props.type}/${item.id}`} onClick={(evt) => this.props.viewRow(evt, item.id)}>View</a>
+                                    <a href={`/${this.props.type}/${item.id}/edit`} onClick={(evt) => this.props.editRow(evt, item.id)}>Edit</a>
+                                    <a href={`/${this.props.type}/${item.id}`} onClick={(evt) => this.props.deleteRow(evt, item.id)}>Delete</a>
                                 </div>
                             </Table.Cell>
                           </Table.Row>
