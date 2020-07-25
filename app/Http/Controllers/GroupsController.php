@@ -46,54 +46,58 @@ class GroupsController extends Controller
             $importFile = request()->file('importFile');
 
             if (isset($importFile)) {
-                $fileData = CsvUtils::getDataFromFilePath($importFile->getRealPath());
+                if ($importFile->getClientMimeType() === 'application/vnd.ms-excel') {
+                    $fileData = CsvUtils::getDataFromFilePath($importFile->getRealPath());
 
-                if (count($fileData) > 1) {
-                    $headers = array_shift($fileData);
+                    if (count($fileData) > 1) {
+                        $headers = array_shift($fileData);
 
-                    if ($headers === ['id', 'group_name']) {
-                        if (CsvUtils::isValidCsvData($headers, $fileData)) {
-                            $mappedFileData = CsvUtils::mapDataToHeaders($headers, $fileData);
+                        if ($headers === ['id', 'group_name']) {
+                            if (CsvUtils::isValidCsvData($headers, $fileData)) {
+                                $mappedFileData = CsvUtils::mapDataToHeaders($headers, $fileData);
 
-                            $existingGroupIds = Group::all()->
-                                map(function ($group) {
-                                    return (string) $group->id;
-                                })->
-                                toArray();
+                                $existingGroupIds = Group::all()->
+                                    map(function ($group) {
+                                        return (string) $group->id;
+                                    })->
+                                    toArray();
 
-                            foreach ($mappedFileData as $row) {
-                                $validator = Validator::make($row, [
-                                    'group_name' => 'required|max:255'
-                                ]);
+                                foreach ($mappedFileData as $row) {
+                                    $validator = Validator::make($row, [
+                                        'group_name' => 'required|max:255'
+                                    ]);
 
-                                if ($validator->fails()) {
-                                    return [
-                                        'validationFailure' => true
-                                    ];
+                                    if ($validator->fails()) {
+                                        return [
+                                            'validationFailure' => true
+                                        ];
+                                    }
+
+                                    // Update or insert.
+                                    if (in_array($row['id'], $existingGroupIds)) {
+                                        Group::find($row['id'])->update($row);
+                                    } else {
+                                        Group::create($row);
+                                    }
                                 }
 
-                                // Update or insert.
-                                if (in_array($row['id'], $existingGroupIds)) {
-                                    Group::find($row['id'])->update($row);
-                                } else {
-                                    Group::create($row);
-                                }
+                                return new GroupsCollection(Group::all());
                             }
 
-                            return new GroupsCollection(Group::all());
+                            return ResponseUtils::error('The CSV file is not properly formatted. Please try again.');
                         }
 
-                        return ResponseUtils::error('The CSV file is not properly formatted. Please try again.');
+                        return ResponseUtils::error('The CSV file headers are not valid. The header row must be the following: id, group_name');
                     }
 
-                    return ResponseUtils::error('The CSV file headers are not valid. The header row must be the following: id, group_name');
+                    return ResponseUtils::error('The CSV file does not contain any data.');
                 }
 
-                return ResponseUtils::error('The CSV file does not contain any data.');
+                return ResponseUtils::error('The uploaded file is not a valid CSV file. Please try again.');
             }
         }
 
-        return ResponseUtils::error('The selected file is not a valid CSV file. Please try again.');
+        return ResponseUtils::error('Please upload a valid file.');
     }
 
     /**
@@ -153,6 +157,6 @@ class GroupsController extends Controller
         $group = Group::findOrFail($id);
         $group->delete();
 
-        return response()->json(null, 204);
+        return ResponseUtils::success();
     }
 }

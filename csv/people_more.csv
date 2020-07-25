@@ -4,5 +4,5 @@ id, first_name, last_name, email_address, status, group_name
 3, "Fred", "Flintstone", "fredflintstone@example.com", "active", "Volunteers"
 4, "Marie", "Bourne", "mbourne@example.com", "active", "Elders"
 5, "Wilma", "Flintstone", "wilmaflinstone@example.com", "active", "Elders"
-6, "Bob", "<strong>Smith</strong>", "bsmith@example.com", "archived", ""
-7, "Barbara", "Smith", "bsmith2@example.com", "active", ""
+6, "Bob", "<strong>Smith</strong>", "bsmith@example.com", "archived", "Preschool"
+7, "Barbara", "Smith", "bsmith2@example.com", "active", "Preschool"

@@ -13,7 +13,6 @@ class Tab extends Component {
         this.state = {
             viewItem: null,
             editData: null,
-            deleteItem: null,
             data: []
         };
     }
@@ -53,6 +52,23 @@ class Tab extends Component {
     deleteRow(evt, id) {
         return (evt, id) => {
             console.log('deleteRow', this.props.type, id);
+            const type = this.props.type;
+
+            // To-do: Better package up and abstract out to make easier to use.
+            eventBus.emit('showModal', {
+                msg: type === 'people' ? 'Are you sure you remove this person?' : 'Are you sure you want to remove this group?',
+                callback: () => {
+                    fetch(`http://localhost:8000/api/${type}/${id}`, {
+                            method: 'delete'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            eventBus.emit('successFlashMsg', (type === 'people' ? 'Person' : 'Group') + ' successfully deleted.');
+                            this.getData();
+                        })
+                        .catch(() => eventBus.emit('errorFlashMsg', 'A system error occurred. Please try again.'));
+                }
+            });
 
             evt.preventDefault();
         };
@@ -121,6 +137,7 @@ class Tab extends Component {
                 .then(data => {
                     if (data.success) {
                         this.setState({ data: data.data });
+                        eventBus.emit('successFlashMsg', 'Data successfully imported.');
                     } else if (data.error) {
                         eventBus.emit('errorFlashMsg', data.msg);
                     }

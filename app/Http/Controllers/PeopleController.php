@@ -48,70 +48,74 @@ class PeopleController extends Controller
             $importFile = request()->file('importFile');
 
             if (isset($importFile)) {
-                $fileData = CsvUtils::getDataFromFilePath($importFile->getRealPath());
+                if ($importFile->getClientMimeType() === 'application/vnd.ms-excel') {
+                    $fileData = CsvUtils::getDataFromFilePath($importFile->getRealPath());
 
-                if (count($fileData) > 1) {
-                    $headers = array_shift($fileData);
+                    if (count($fileData) > 1) {
+                        $headers = array_shift($fileData);
 
-                    if ($headers === ['id', 'first_name', 'last_name', 'email_address', 'status'] ||
-                        $headers === ['id', 'first_name', 'last_name', 'email_address', 'status', 'group_name']) {
-                        if (CsvUtils::isValidCsvData($headers, $fileData)) {
-                            $mappedFileData = CsvUtils::mapDataToHeaders($headers, $fileData);
+                        if ($headers === ['id', 'first_name', 'last_name', 'email_address', 'status'] ||
+                            $headers === ['id', 'first_name', 'last_name', 'email_address', 'status', 'group_name']) {
+                            if (CsvUtils::isValidCsvData($headers, $fileData)) {
+                                $mappedFileData = CsvUtils::mapDataToHeaders($headers, $fileData);
 
-                            $existingPeopleIds = Person::all()->
-                                map(function ($person) {
-                                    return (string) $person->id;
-                                })->
-                                toArray();
+                                $existingPeopleIds = Person::all()->
+                                    map(function ($person) {
+                                        return (string) $person->id;
+                                    })->
+                                    toArray();
 
-                            $groupsMap = Group::all()->
-                                mapWithKeys(function ($group) {
-                                    return [$group->group_name => $group->id];
-                                });
+                                $groupsMap = Group::all()->
+                                    mapWithKeys(function ($group) {
+                                        return [$group->group_name => $group->id];
+                                    });
 
-                            foreach ($mappedFileData as $row) {
-                                // https://laravel.com/docs/7.x/validation
-                                $validator = Validator::make($row, [
-                                    'first_name'    => 'required|max:255',
-                                    'last_name'     => 'required|max:255',
-                                    'email_address' => 'required|email',
-                                    'status'        => Rule::in(['active', 'archived']),
-                                    'group_name'    => 'nullable'
-                                ]);
+                                foreach ($mappedFileData as $row) {
+                                    // https://laravel.com/docs/7.x/validation
+                                    $validator = Validator::make($row, [
+                                        'first_name'    => 'required|max:255',
+                                        'last_name'     => 'required|max:255',
+                                        'email_address' => 'required|email',
+                                        'status'        => Rule::in(['active', 'archived']),
+                                        'group_name'    => 'nullable'
+                                    ]);
 
-                                if ($validator->fails()) {
-                                    return [
-                                        'validationFailure' => true
-                                    ];
+                                    if ($validator->fails()) {
+                                        return [
+                                            'validationFailure' => true
+                                        ];
+                                    }
+
+                                    // Check for a valid group name and map to a group ID.
+                                    if (isset($row['group_name'])) {
+                                        $row['group_id'] = $groupsMap[$row['group_name']] ?? null;
+                                    }
+
+                                    // Update or insert.
+                                    if (in_array($row['id'], $existingPeopleIds)) {
+                                        Person::find($row['id'])->update($row);
+                                    } else {
+                                        Person::create($row);
+                                    }
                                 }
 
-                                // Check for a valid group name and map to a group ID.
-                                if (isset($row['group_name'])) {
-                                    $row['group_id'] = $groupsMap[$row['group_name']] ?? null;
-                                }
-
-                                // Update or insert.
-                                if (in_array($row['id'], $existingPeopleIds)) {
-                                    Person::find($row['id'])->update($row);
-                                } else {
-                                    Person::create($row);
-                                }
+                                return new PeopleCollection(Person::all());
                             }
 
-                            return new PeopleCollection(Person::all());
+                            return ResponseUtils::error('The CSV file is not properly formatted. Please try again.');
                         }
 
-                        return ResponseUtils::error('The CSV file is not properly formatted. Please try again.');
+                        return ResponseUtils::error('The CSV file headers are not valid. The header row must be one of the following: id, first_name, last_name, email_address, status OR id, first_name, last_name, email_address, status, group_name');
                     }
 
-                    return ResponseUtils::error('The CSV file headers are not valid. The header row must be one of the following: id, first_name, last_name, email_address, status OR id, first_name, last_name, email_address, status, group_name');
+                    return ResponseUtils::error('The CSV file does not contain any data.');
                 }
 
-                return ResponseUtils::error('The CSV file does not contain any data.');
+                return ResponseUtils::error('The uploaded file is not a valid CSV file. Please try again.');
             }
         }
 
-        return ResponseUtils::error('The selected file is not a valid CSV file. Please try again.');
+        return ResponseUtils::error('Please upload a valid file.');
     }
 
     /**
@@ -167,6 +171,7 @@ class PeopleController extends Controller
         $person = Person::findOrFail($id);
         $requestData = $request->all();
 
+        // To-do: Switch out with Laravel validation. Same for groups too.
         if (isset($requestData['first_name'], $requestData['last_name'], $requestData['email_address'], $requestData['status']) &&
             !empty($requestData['first_name']) &&
             !empty($requestData['last_name']) &&
@@ -196,6 +201,6 @@ class PeopleController extends Controller
         $person = Person::findOrFail($id);
         $person->delete();
 
-        return response()->json(null, 204);
+        return ResponseUtils::success();
     }
 }

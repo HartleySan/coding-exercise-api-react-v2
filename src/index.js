@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 
 import SiteContainer from "./SiteContainer";
 import FlashMsg from "./FlashMsg";
+import Modal from "./Modal";
 
 import './index.css';
 
@@ -10,6 +11,7 @@ const App = () => (
     <div>
         <SiteContainer />
         <FlashMsg />
+        <Modal />
     </div>
 );
 

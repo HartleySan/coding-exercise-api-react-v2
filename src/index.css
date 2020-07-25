@@ -47,3 +47,19 @@ table thead tr th.single.line.sortable:hover {
     border: #D9ECCD solid 1px;
     color: #3C7642;
 }
+
+.modal {
+    background: #FFF;
+    border: #AAA solid 1px;
+    left: 50%;
+    margin-left: -200px;
+    padding: 20px;
+    position: fixed;
+    top: 300px;
+    width: 400px;
+}
+
+.modal .btns {
+    margin-top: 20px;
+    text-align: right;
+}
