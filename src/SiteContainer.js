@@ -1,3 +1,4 @@
+// To-do: Consistently use semicolons, spacing, etc.
 import React, { Component } from 'react'
 import { Container, Header } from 'semantic-ui-react'
 
