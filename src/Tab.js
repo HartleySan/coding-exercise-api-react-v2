@@ -22,6 +22,7 @@ class Tab extends Component {
     }
 
     getData() {
+        // To-do: Switch out with Axios?
         fetch(`http://localhost:8000/api/${this.props.type}`)
           .then(response => response.json())
           .then(data => this.setState({ data: data.data }));

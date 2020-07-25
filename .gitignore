@@ -3,6 +3,7 @@
 /coverage
 /public/hot
 /public/storage
+/src/__snapshots__
 /storage/*.key
 /vendor
 .env
