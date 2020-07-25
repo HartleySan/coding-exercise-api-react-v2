@@ -28,6 +28,32 @@ class Tab extends Component {
           .then(data => this.setState({ data: data.data }));
     }
 
+    uploadFile(evt, type) {
+        const files = evt.target.files;
+
+        if (files.length) {
+            let formData = new FormData();
+
+            formData.append('importFile', files[0]);
+
+            fetch(`http://localhost:8000/api/${type}`, {
+                    method: 'post',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.setState({ data: data.data });
+                        eventBus.emit('successFlashMsg', 'Data successfully imported.');
+                    } else if (data.error) {
+                        eventBus.emit('errorFlashMsg', data.msg);
+                    }
+                });
+
+            document.querySelector('.importFile').value = '';
+        }
+    }
+
     viewRow() {
         return (evt, id) => {
             fetch(`http://localhost:8000/api/${this.props.type}/${id}`)
@@ -120,32 +146,6 @@ class Tab extends Component {
                 {this.renderContent()}
             </div>
         );
-    }
-
-    uploadFile(evt, type) {
-        const files = evt.target.files;
-
-        if (files.length) {
-            let formData = new FormData();
-
-            formData.append('importFile', files[0]);
-
-            fetch(`http://localhost:8000/api/${type}`, {
-                    method: 'post',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        this.setState({ data: data.data });
-                        eventBus.emit('successFlashMsg', 'Data successfully imported.');
-                    } else if (data.error) {
-                        eventBus.emit('errorFlashMsg', data.msg);
-                    }
-                });
-
-            document.querySelector('.importFile').value = '';
-        }
     }
 
 }

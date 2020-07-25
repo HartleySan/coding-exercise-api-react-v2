@@ -68,9 +68,9 @@ class GroupsController extends Controller
                                     ]);
 
                                     if ($validator->fails()) {
-                                        return [
-                                            'validationFailure' => true
-                                        ];
+                                        $errorsStr = implode("\n", $validator->errors()->all());
+
+                                        return ResponseUtils::error("The following errors have occurred with trying to import the uploaded file: $errorsStr");
                                     }
 
                                     // Update or insert.
@@ -136,14 +136,9 @@ class GroupsController extends Controller
         $group = Group::findOrFail($id);
         $requestData = $request->all();
 
-        if (isset($requestData['group_name']) &&
-            !empty($requestData['group_name'])) {
-            $group->update($requestData);
+        $group->update($requestData);
 
-            return ResponseUtils::success();
-        }
-
-        return ResponseUtils::error('Please provide a valid value for all fields.');
+        return ResponseUtils::success();
     }
 
     /**

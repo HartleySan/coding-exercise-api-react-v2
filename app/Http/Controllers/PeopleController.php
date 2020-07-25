@@ -81,9 +81,9 @@ class PeopleController extends Controller
                                     ]);
 
                                     if ($validator->fails()) {
-                                        return [
-                                            'validationFailure' => true
-                                        ];
+                                        $errorsStr = implode("\n", $validator->errors()->all());
+
+                                        return ResponseUtils::error("The following errors have occurred with trying to import the uploaded file: $errorsStr");
                                     }
 
                                     // Check for a valid group name and map to a group ID.
@@ -171,23 +171,14 @@ class PeopleController extends Controller
         $person = Person::findOrFail($id);
         $requestData = $request->all();
 
-        // To-do: Switch out with Laravel validation. Same for groups too.
-        if (isset($requestData['first_name'], $requestData['last_name'], $requestData['email_address'], $requestData['status']) &&
-            !empty($requestData['first_name']) &&
-            !empty($requestData['last_name']) &&
-            !empty($requestData['email_address']) &&
-            !empty($requestData['status'])) {
-            if (isset($requestData['group_id']) &&
-                $requestData['group_id'] === 0) {
-                $requestData['group_id'] = null;
-            }
-
-            $person->update($requestData);
-
-            return ResponseUtils::success();
+        if (isset($requestData['group_id']) &&
+            $requestData['group_id'] === 0) {
+            $requestData['group_id'] = null;
         }
 
-        return ResponseUtils::error('Please provide a valid value for all fields.');
+        $person->update($requestData);
+
+        return ResponseUtils::success();
     }
 
     /**
