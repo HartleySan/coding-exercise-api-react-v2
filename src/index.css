@@ -12,6 +12,15 @@ code {
     monospace;
 }
 
+table thead tr th.single.line.sortable {
+    cursor: pointer;
+}
+
+table thead tr th.single.line.sortable:hover {
+    background: #4141EF;
+    color: #FFF;
+}
+
 .crudActions {
     display: flex;
     justify-content: space-between;

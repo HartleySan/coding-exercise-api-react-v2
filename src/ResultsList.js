@@ -4,12 +4,61 @@ import { Table } from 'semantic-ui-react'
 class ResultsList extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            sortCol: 'id',
+            sortOrder: 'asc'
+        };
+    }
+
+    sortData(data) {
+        const sortCol = this.state.sortCol;
+        const sortOrder = this.state.sortOrder;
+
+        data.sort((a, b) => {
+            if (sortOrder === 'asc') {
+                if (!a[sortCol]) {
+                    return -1;
+                } else if (!b[sortCol]) {
+                    return 1;
+                }
+
+                return a[sortCol] < b[sortCol] ? -1 : 1;
+            }
+
+            if (!a[sortCol]) {
+                return 1;
+            } else if (!b[sortCol]) {
+                return -1;
+            }
+
+            return a[sortCol] > b[sortCol] ? -1 : 1;
+        });
+
+        return data;
+    }
+
+    setTableSort(sortCol) {
+        let sortOrder = 'asc';
+
+        sortOrder = sortCol === this.state.sortCol && this.state.sortOrder === 'asc' ? 'desc' : 'asc';
+
+        this.setState({
+            sortCol: sortCol,
+            sortOrder: sortOrder
+        });
+    }
+
+    renderSortArrow(sortCol) {
+        if (sortCol === this.state.sortCol) {
+            return this.state.sortOrder === 'asc' ? '▲' : '▼';
+        }
+
+        return null;
     }
 
     render() {
         // To-do: Pagination?
-        var data = this.props.data || [];
+        var data = this.sortData(this.props.data || []);
         const cols = this.getCols();
 
         return (
@@ -18,7 +67,7 @@ class ResultsList extends Component {
                 <Table.Row>
                     {cols.map((col, index) => {
                         return (
-                            <Table.HeaderCell singleLine key={index}>{col.label}</Table.HeaderCell>
+                            <Table.HeaderCell singleLine className="sortable" key={index} onClick={() => this.setTableSort(col.id)}>{col.label}{this.renderSortArrow(col.id)}</Table.HeaderCell>
                         );
                     })}
                     <Table.HeaderCell singleLine></Table.HeaderCell>

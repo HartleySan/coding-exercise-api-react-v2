@@ -24,6 +24,16 @@ class FlashMsg extends Component {
                 type: 'success',
                 msg: msg
             });
+
+            setTimeout(() => {
+                if (this.state.type &&
+                    this.state.msg) {
+                    this.setState({
+                        type: null,
+                        msg: null
+                    });
+                }
+            }, 2000);
         });
     }
 

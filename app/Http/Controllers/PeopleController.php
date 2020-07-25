@@ -167,12 +167,13 @@ class PeopleController extends Controller
         $person = Person::findOrFail($id);
         $requestData = $request->all();
 
-        if (isset($requestData['first_name'], $requestData['last_name'], $requestData['email_address'], $requestData['status'], $requestData['group_id']) &&
+        if (isset($requestData['first_name'], $requestData['last_name'], $requestData['email_address'], $requestData['status']) &&
             !empty($requestData['first_name']) &&
             !empty($requestData['last_name']) &&
             !empty($requestData['email_address']) &&
             !empty($requestData['status'])) {
-            if ($requestData['group_id'] === 0) {
+            if (isset($requestData['group_id']) &&
+                $requestData['group_id'] === 0) {
                 $requestData['group_id'] = null;
             }
 
