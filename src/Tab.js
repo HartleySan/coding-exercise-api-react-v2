@@ -110,8 +110,7 @@ class Tab extends Component {
                     goBack={() => this.setState({ viewItem: null })}
                 />
             );
-        } else 
-        if (this.state.editData) {
+        } else if (this.state.editData) {
             return (
                 <EditItem
                     type={this.props.type}

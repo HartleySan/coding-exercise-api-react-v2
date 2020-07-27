@@ -1,12 +1,17 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import SiteContainer from './SiteContainer';
+import FlashMsg from '../FlashMsg';
 
 let wrapper;
 
-describe('<SiteContainer />', () => {
+describe('<FlashMsg />', () => {
     beforeAll(() => {
-        wrapper = shallow(<SiteContainer />);
+        wrapper = shallow(<FlashMsg />);
+
+        wrapper.setState({
+            type: null,
+            msg: null
+        });
     });
 
     test('should match the snapshot', () => {
